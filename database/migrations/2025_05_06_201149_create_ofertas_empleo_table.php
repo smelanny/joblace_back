@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('usuarios');
             $table->string('titulo_puesto');
             $table->text('descripcion_puesto');
-            $table->enum('tipo_contrato', ['tiempo_completo', 'medio_tiempo', 'freelance', 'practica']);
+            $table->enum('tipo_jornada', ['tiempo_completo', 'medio_tiempo', 'freelance', 'practica']);
             $table->string('ubicacion');
             $table->decimal('salario_estimado', 10, 2);
             $table->date('fecha_publicacion');
