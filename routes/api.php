@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\RepresentanteEmpresaController;
+use App\Http\Controllers\OfertaEmpleoController;
 use App\Http\Controllers\CategoriaController;
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
@@ -36,6 +37,23 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/empresas/{empresaId}/representantes', [RepresentanteEmpresaController::class, 'getByEmpresa']);
     Route::get('/usuarios/{userId}/representaciones', [RepresentanteEmpresaController::class, 'getByUsuario']);
 
-    // Rutas de categorías
+    // Rutas para ofertas de empleo
+    Route::get('/ofertas', [OfertaEmpleoController::class, 'index']);
+    Route::get('/ofertas/buscar', [OfertaEmpleoController::class, 'buscar']);
+    Route::get('/ofertas/{id}', [OfertaEmpleoController::class, 'show']);
+    Route::post('/ofertas', [OfertaEmpleoController::class, 'store']);
+    Route::put('/ofertas/{id}', [OfertaEmpleoController::class, 'update']);
+    Route::delete('/ofertas/{id}', [OfertaEmpleoController::class, 'destroy']);
+    
+    // Rutas adicionales para ofertas de empleo
+    Route::get('/ofertas/empresa/{empresaId}', [OfertaEmpleoController::class, 'getByEmpresa']);
+    Route::get('/ofertas/usuario/{userId}', [OfertaEmpleoController::class, 'getByUsuario']);
+    Route::get('/ofertas/{id}/categorias', [OfertaEmpleoController::class, 'getCategorias']);
+    Route::post('/ofertas/{id}/categorias', [OfertaEmpleoController::class, 'attachCategorias']);
+    Route::delete('/ofertas/{id}/categorias', [OfertaEmpleoController::class, 'detachCategorias']);
+    Route::get('/ofertas/{id}/postulaciones', [OfertaEmpleoController::class, 'getPostulaciones']);
+
+    // Rutas para categorías
     Route::get('/categorias', [CategoriaController::class, 'index']);
+    Route::post('/categorias', [CategoriaController::class, 'store']);
 });

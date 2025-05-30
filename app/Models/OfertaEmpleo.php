@@ -2,13 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Models\Usuario;
 
 class OfertaEmpleo extends Model
 {
+    use HasFactory;
+
     protected $table = 'ofertas_empleo';
+    
+    // Deshabilitar timestamps
+    public $timestamps = false;
 
     protected $fillable = [
         'empresa_id',
@@ -23,20 +28,30 @@ class OfertaEmpleo extends Model
         'modalidad'
     ];
 
-    public function empresa(): BelongsTo
+    protected $casts = [
+        'fecha_publicacion' => 'date',
+        'salario_estimado' => 'decimal:2'
+    ];
+
+    // Relaciones
+    public function empresa()
     {
         return $this->belongsTo(Empresa::class);
     }
 
-    public function usuario(): BelongsTo
+    public function usuario()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(Usuario::class, 'user_id');
     }
 
-    public function categorias(): BelongsToMany
+    public function categorias()
     {
         return $this->belongsToMany(Categoria::class, 'oferta_categoria', 'oferta_id', 'categoria_id')
-            ->withPivot('fecha_asociacion')
-            ->withTimestamps();
+            ->withPivot('fecha_asociacion');
     }
-} 
+
+    public function postulaciones()
+    {
+        return $this->hasMany(Postulacion::class, 'oferta_id');
+    }
+}

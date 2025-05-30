@@ -10,12 +10,12 @@ class OfertaEmpleoController extends Controller
 {
     public function index()
     {
-        return response()->json(OfertaEmpleo::with(['empresa', 'usuario', 'categorias'])->get());
+        return response()->json(OfertaEmpleo::with(['empresa', 'usuario'])->get());
     }
 
     public function show($id)
     {
-        $oferta = OfertaEmpleo::with(['empresa', 'usuario', 'categorias'])->find($id);
+        $oferta = OfertaEmpleo::with(['empresa', 'usuario'])->find($id);
         if (!$oferta) {
             return response()->json(['message' => 'Oferta no encontrada'], 404);
         }
@@ -32,9 +32,7 @@ class OfertaEmpleoController extends Controller
             'tipo_jornada' => 'required|in:tiempo_completo,medio_tiempo,freelance,practica',
             'ubicacion' => 'required|string',
             'salario_estimado' => 'required|numeric',
-            'modalidad' => 'required|in:presencial,remoto,hibrido',
-            'categorias' => 'required|array',
-            'categorias.*' => 'exists:categorias,id'
+            'modalidad' => 'required|in:presencial,remoto,hibrido'
         ]);
 
         if ($validator->fails()) {
@@ -49,22 +47,20 @@ class OfertaEmpleoController extends Controller
             $data['estado'] = 'activa';
         }
 
-        $categorias = $data['categorias'];
-        unset($data['categorias']);
-
         $oferta = OfertaEmpleo::create($data);
-        
-        // Asociar categorías con la fecha actual
-        $categoriasConFecha = collect($categorias)->mapWithKeys(function ($categoriaId) {
-            return [$categoriaId => ['fecha_asociacion' => now()]];
-        })->all();
-        
-        $oferta->categorias()->attach($categoriasConFecha);
 
-        return response()->json([
-            'message' => 'Oferta publicada exitosamente', 
-            'oferta' => $oferta->load('categorias')
-        ], 201);
+        // Asociar categorías si se envían
+        if ($request->has('categorias')) {
+            $categorias = $request->input('categorias'); // array de IDs
+            $pivotData = [];
+            $fecha = date('Y-m-d');
+            foreach ($categorias as $catId) {
+                $pivotData[$catId] = ['fecha_asociacion' => $fecha];
+            }
+            $oferta->categorias()->attach($pivotData);
+        }
+
+        return response()->json(['message' => 'Oferta publicada exitosamente', 'oferta' => $oferta], 201);
     }
 
     public function update(Request $request, $id)
@@ -82,34 +78,15 @@ class OfertaEmpleoController extends Controller
             'salario_estimado' => 'sometimes|required|numeric',
             'fecha_publicacion' => 'sometimes|required|date',
             'estado' => 'sometimes|required|in:activa,cerrada,cancelada',
-            'modalidad' => 'sometimes|required|in:presencial,remoto,hibrido',
-            'categorias' => 'sometimes|required|array',
-            'categorias.*' => 'exists:categorias,id'
+            'modalidad' => 'sometimes|required|in:presencial,remoto,hibrido'
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $data = $request->all();
-        
-        if (isset($data['categorias'])) {
-            $categorias = $data['categorias'];
-            unset($data['categorias']);
-            
-            // Actualizar categorías con la fecha actual
-            $categoriasConFecha = collect($categorias)->mapWithKeys(function ($categoriaId) {
-                return [$categoriaId => ['fecha_asociacion' => now()]];
-            })->all();
-            
-            $oferta->categorias()->sync($categoriasConFecha);
-        }
-
-        $oferta->update($data);
-        return response()->json([
-            'message' => 'Oferta actualizada exitosamente', 
-            'oferta' => $oferta->load('categorias')
-        ]);
+        $oferta->update($request->all());
+        return response()->json(['message' => 'Oferta actualizada exitosamente', 'oferta' => $oferta]);
     }
 
     public function destroy($id)
