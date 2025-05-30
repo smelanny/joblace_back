@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class Usuario extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $table = 'usuarios';
 
@@ -34,6 +35,7 @@ class Usuario extends Authenticatable
      */
     protected $hidden = [
         'contrasena_hash',
+        'remember_token',
     ];
 
     /**
@@ -104,5 +106,10 @@ class Usuario extends Authenticatable
     public function representanteEmpresa()
     {
         return $this->hasOne(RepresentanteEmpresa::class);
+    }
+
+    public function representaciones()
+    {
+        return $this->hasMany(RepresentanteEmpresa::class, 'user_id');
     }
 } 
