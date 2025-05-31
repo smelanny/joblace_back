@@ -7,6 +7,8 @@ use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\RepresentanteEmpresaController;
 use App\Http\Controllers\OfertaEmpleoController;
 use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\PostulacionController;
+use App\Http\Controllers\CandidatoController;
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
@@ -63,4 +65,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/candidatos', [CandidatoController::class, 'store']);
     Route::put('/candidatos/{userId}', [CandidatoController::class, 'update']);
     Route::delete('/candidatos/{userId}', [CandidatoController::class, 'destroy']);
+
+    // Rutas para postulaciones
+    Route::post('/postulaciones', [PostulacionController::class, 'store']);
+    Route::get('/empresas/{empresaId}/postulaciones', [PostulacionController::class, 'getByEmpresa']);
+
 });
