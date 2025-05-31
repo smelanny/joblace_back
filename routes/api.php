@@ -56,4 +56,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // Rutas para categorías
     Route::get('/categorias', [CategoriaController::class, 'index']);
     Route::post('/categorias', [CategoriaController::class, 'store']);
+
+    // Rutas para candidatos
+    Route::get('/candidatos', [CandidatoController::class, 'index']);
+    Route::get('/candidatos/{userId}', [CandidatoController::class, 'show']);
+    Route::post('/candidatos', [CandidatoController::class, 'store']);
+    Route::put('/candidatos/{userId}', [CandidatoController::class, 'update']);
+    Route::delete('/candidatos/{userId}', [CandidatoController::class, 'destroy']);
 });
