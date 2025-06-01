@@ -22,6 +22,15 @@ class PostulacionController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+         // Verificar si ya existe una postulacion
+        $existe = Postulacion::where('user_id', $request->user_id)
+            ->where('oferta_id', $request->oferta_id)
+            ->exists();
+
+        if ($existe) {
+            return response()->json(['message' => 'Ya has postulado a esta oferta.'], 409);
+        }
+
         $data = $request->only('user_id', 'oferta_id', 'mensaje_adicional');
         $data['fecha_postulacion'] = date('Y-m-d');
         $data['estado'] = 'pendiente';
