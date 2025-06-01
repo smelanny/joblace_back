@@ -15,6 +15,7 @@ class OfertasEmpleoSeeder extends Seeder
     public function run(): void
     {
         DB::table('ofertas_empleo')->insert([
+            [
             'empresa_id' => 1,
             'user_id' => 1,
             'titulo_puesto' => 'Desarrollador Laravel',
@@ -25,6 +26,19 @@ class OfertasEmpleoSeeder extends Seeder
             'fecha_publicacion' => now(),
             'estado' => 'activa',
             'modalidad' => 'remoto',
+            ],
+            [
+            'empresa_id' => 2,
+            'user_id' => 1,
+            'titulo_puesto' => 'Desarrollador ',
+            'descripcion_puesto' => 'Buscamos un desarrollador con experiencia en Laravel y MySQL.',
+            'tipo_jornada' => 'tiempo_completo',
+            'ubicacion' => 'San Jose, CR',
+            'salario_estimado' => 1800.00,
+            'fecha_publicacion' => now(),
+            'estado' => 'activa',
+            'modalidad' => 'remoto',   
+            ]
         ]);
     }
 }
