@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('industria');
             $table->string('sitio_web')->nullable();
             $table->string('logo_url')->nullable();
+            $table->timestamps();
         });
     }
 

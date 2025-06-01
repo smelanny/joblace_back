@@ -23,6 +23,7 @@ return new class extends Migration
             $table->date('fecha_publicacion');
             $table->enum('estado', ['activa', 'cerrada', 'cancelada']);
             $table->enum('modalidad', ['presencial', 'remoto', 'hibrido']);
+            $table->timestamps();
         });
     }
 
