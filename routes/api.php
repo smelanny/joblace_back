@@ -14,12 +14,12 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Rutas públicas
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+    // Rutas públicas
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
 
-// Rutas protegidas
-Route::middleware('auth:sanctum')->group(function () {
+    // Rutas protegidas
+    Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
 
@@ -69,5 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Rutas para postulaciones
     Route::post('/postulaciones', [PostulacionController::class, 'store']);
     Route::get('/empresas/{empresaId}/postulaciones', [PostulacionController::class, 'getByEmpresa']);
+    Route::get('/postulaciones/{id}', [PostulacionController::class, 'show']);
+    Route::put('/postulaciones/{id}/estado', [PostulacionController::class, 'actualizarEstado']);
 
 });

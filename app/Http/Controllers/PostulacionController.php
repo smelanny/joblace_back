@@ -52,4 +52,51 @@ class PostulacionController extends Controller
 
         return response()->json($postulaciones);
     }
+
+
+    // Método para aceptar/rechazar postulaciones 
+    public function actualizarEstado(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'estado' => 'required|in:aceptado,rechazado',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $postulacion = Postulacion::find($id);
+
+        if (!$postulacion) {
+            return response()->json(['message' => 'Postulación no encontrada'], 404);
+        }
+
+        $postulacion->estado = $request->estado;
+        $postulacion->save();
+
+        // Si fue aceptada, cerrar la oferta
+        if ($request->estado === 'aceptado') {
+            $oferta = $postulacion->oferta;
+            if ($oferta->estado !== 'cerrada') {
+                $oferta->estado = 'cerrada';
+                $oferta->save();
+            }
+        }
+
+        return response()->json(['message' => 'Estado actualizado correctamente', 'postulacion' => $postulacion]);
+    }
+
+    // Método para obtener los detalles de una postulación específica
+    public function show($id)
+    {
+        $postulacion = Postulacion::with(['usuario', 'oferta'])
+            ->find($id);
+
+        if (!$postulacion) {
+            return response()->json(['message' => 'Postulación no encontrada.'], 404);
+        }
+
+        return response()->json($postulacion);
+    }
+
 }
