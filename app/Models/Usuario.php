@@ -97,8 +97,8 @@ class Usuario extends Authenticatable
      */
     public function candidato()
     {
-    return $this->hasOne(Candidato::class, 'user_id', 'id');
-}
+        return $this->hasOne(Candidato::class, 'user_id', 'id');
+    }
     /**
      * Obtiene el perfil del representante de empresa asociado si existe
      */

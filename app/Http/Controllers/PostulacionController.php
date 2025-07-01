@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Postulacion;
 use App\Models\OfertaEmpleo;
 use Illuminate\Support\Facades\Validator;
+use App\Notifications\EstadoPostulacionActualizado;
 
 class PostulacionController extends Controller
 {
@@ -74,8 +75,19 @@ class PostulacionController extends Controller
         $postulacion->estado = $request->estado;
         $postulacion->save();
 
-        // Si fue aceptada, cerrar la oferta
-        if ($request->estado === 'aceptado') {
+        $estado = $request->estado;
+        $estadoTexto = $estado === 'aceptado' ? 'aceptada' : 'rechazada';
+        $puesto = $postulacion->oferta->titulo_puesto ?? 'la oferta';
+
+        $mensaje = "Tu postulación al puesto de {$puesto} ha sido {$estadoTexto}.";
+
+        $postulacion->usuario->notify(new EstadoPostulacionActualizado(
+            $estado,
+            $mensaje,
+            $postulacion->user_id
+        ));
+
+        if ($estado === 'aceptado') {
             $oferta = $postulacion->oferta;
             if ($oferta->estado !== 'cerrada') {
                 $oferta->estado = 'cerrada';

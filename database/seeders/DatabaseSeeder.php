@@ -24,8 +24,7 @@ class DatabaseSeeder extends Seeder
         OfertasEmpleoSeeder::class,
         OfertaCategoriaSeeder::class,
         PostulacionesSeeder::class,
-        DocumentosCandidatoSeeder::class,
-        NotificacionesSeeder::class,
+        DocumentosCandidatoSeeder::class,       
     ]);
 }
 }
