@@ -18,6 +18,19 @@ class CategoriasSeeder extends Seeder
             ['nombre' => 'Desarrollo de Software'],
             ['nombre' => 'Diseño Gráfico'],
             ['nombre' => 'Marketing Digital'],
+            ['nombre' => 'Desarrollo Web'],
+            ['nombre' => 'Desarrollo Móvil'],
+            ['nombre' => 'Diseño UI/UX'],
+            ['nombre' => 'Ventas'],
+            ['nombre' => 'Atención al Cliente'],
+            ['nombre' => 'Administración'],
+            ['nombre' => 'Finanzas'],
+            ['nombre' => 'Recursos Humanos'],
+            ['nombre' => 'Ciberseguridad'],
+            ['nombre' => 'Ciencia de Datos'],
+            ['nombre' => 'Gestión de Proyectos'],
+            ['nombre' => 'Soporte Técnico'],
+            ['nombre' => 'Inteligencia Artificial'],
         ]);
     }
 }

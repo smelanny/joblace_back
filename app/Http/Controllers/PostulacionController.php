@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Postulacion;
 use App\Models\OfertaEmpleo;
 use Illuminate\Support\Facades\Validator;
+use App\Notifications\EstadoPostulacionActualizado;
 
 class PostulacionController extends Controller
 {
@@ -20,6 +21,15 @@ class PostulacionController extends Controller
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+         // Verificar si ya existe una postulacion
+        $existe = Postulacion::where('user_id', $request->user_id)
+            ->where('oferta_id', $request->oferta_id)
+            ->exists();
+
+        if ($existe) {
+            return response()->json(['message' => 'Ya has postulado a esta oferta.'], 409);
         }
 
         $data = $request->only('user_id', 'oferta_id', 'mensaje_adicional');
@@ -43,4 +53,64 @@ class PostulacionController extends Controller
 
         return response()->json($postulaciones);
     }
+
+
+    // Método para aceptar/rechazar postulaciones 
+    public function actualizarEstado(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'estado' => 'required|in:aceptado,rechazado',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $postulacion = Postulacion::find($id);
+
+        if (!$postulacion) {
+            return response()->json(['message' => 'Postulación no encontrada'], 404);
+        }
+
+        $postulacion->estado = $request->estado;
+        $postulacion->save();
+
+        $estado = $request->estado;
+        $estadoTexto = $estado === 'aceptado' ? 'aceptada' : 'rechazada';
+        $puesto = $postulacion->oferta->titulo_puesto ?? 'la oferta';
+
+        $mensaje = "Tu postulación al puesto de {$puesto} ha sido {$estadoTexto}.";
+
+        $postulacion->usuario->notify(new EstadoPostulacionActualizado(
+            $estado,
+            $mensaje,
+            $postulacion->user_id
+        ));
+
+        if ($estado === 'aceptado') {
+            $oferta = $postulacion->oferta;
+            if ($oferta->estado !== 'cerrada') {
+                $oferta->estado = 'cerrada';
+                $oferta->save();
+            }
+        }
+
+        return response()->json(['message' => 'Estado actualizado correctamente', 'postulacion' => $postulacion]);
+    }
+
+    // Método para obtener los detalles de una postulación específica
+    public function show($id)
+    {
+        $postulacion = Postulacion::with([
+            'usuario.candidato', 
+            'oferta'
+        ])->find($id);
+    
+        if (!$postulacion) {
+            return response()->json(['message' => 'Postulación no encontrada.'], 404);
+        }
+    
+        return response()->json($postulacion);
+    }
+
 }

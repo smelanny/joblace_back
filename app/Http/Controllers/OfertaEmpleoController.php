@@ -98,4 +98,41 @@ class OfertaEmpleoController extends Controller
         $oferta->delete();
         return response()->json(['message' => 'Oferta eliminada exitosamente']);
     }
+
+     public function buscar(Request $request)
+    {
+        $query = OfertaEmpleo::with(['empresa', 'usuario', 'categorias']);
+
+        // Filtrar por categoría 
+        if ($request->has('categoria_id')) {
+            $query->whereHas('categorias', function($q) use ($request) {
+                $q->where('categorias.id', $request->categoria_id);
+            });
+        }
+
+        // Filtrar por modalidad 
+        if ($request->has('modalidad')) {
+            $query->where('modalidad', $request->modalidad);
+        }
+
+        // Filtrar por tipo de jornada 
+        if ($request->has('tipo_jornada')) {
+            $query->where('tipo_jornada', $request->tipo_jornada);
+        }
+
+        // Filtrar por búsqueda de texto 
+        if ($request->has('busqueda')) {
+            $busqueda = $request->busqueda;
+            $query->where(function($q) use ($busqueda) {
+                $q->where('titulo_puesto', 'like', "%{$busqueda}%")
+                  ->orWhere('descripcion_puesto', 'like', "%{$busqueda}%")
+                  ->orWhereHas('empresa', function($q) use ($busqueda) {
+                      $q->where('nombre', 'like', "%{$busqueda}%");
+                  });
+            });
+        }
+
+        $ofertas = $query->get();
+        return response()->json($ofertas);
+    }
 } 
